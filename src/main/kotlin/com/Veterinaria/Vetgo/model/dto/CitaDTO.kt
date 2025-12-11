@@ -30,14 +30,5 @@ data class AccionRequest(
     val accion: CitaAccion,
     val actorId: Int
 )
-/*
-data class CitaListaResponse(
-    val citas: List<CitaResponse>
-)
-
-data class CancelarCitaRequest(
-    val motivo: String? = null
-)*/
-
 
 

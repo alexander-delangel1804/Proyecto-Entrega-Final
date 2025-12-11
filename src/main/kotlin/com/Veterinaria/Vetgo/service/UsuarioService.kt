@@ -32,7 +32,7 @@ class UsuarioService(
         }
 
         val usuarioResponse = UsuarioResponse(
-            idUsuario = usuario.idUsuario!!,
+            idUsuario = usuario.idUsuario,
             nombre = usuario.nombre,
             correo = usuario.correo,
             telefono = usuario.telefono,

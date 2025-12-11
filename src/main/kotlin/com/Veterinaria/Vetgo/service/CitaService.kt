@@ -9,6 +9,8 @@ import com.Veterinaria.Vetgo.model.enums.CitaEstado
 import com.Veterinaria.Vetgo.repository.CitaRepository
 import org.springframework.stereotype.Service
 import com.Veterinaria.Vetgo.model.enums.toResponse
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -20,10 +22,11 @@ class CitaService(
             .map { it.toResponse() }
     }
 
-    fun obtenerCitasPendientes(): List<CitaResponse> {
-        return citaRepo.findByEstado(CitaEstado.EN_ESPERA)
+    /*fun obtenerCitasPendientes(): List<CitaResponse> {
+        return citaRepo.findByEstado(CitaEstado.EN_ESPERA.valor)
             .map { it.toResponse() }
     }
+     */
 
     fun ejecutarAccion(idCita: Int, req: AccionRequest): CitaResponse {
         val cita = procesarAccion(
@@ -105,7 +108,26 @@ class CitaService(
         }
     }
 
+    fun obtenerPorMetodoPago(metodoPago: String): List<CitaResponse> {
+        return citaRepo.findByMetodoPago(metodoPago)
+            .map { it.toResponse() }
+    }
 
+    fun obtenerPorEstado(estado: CitaEstado): List<CitaResponse> {
+        return citaRepo.findByEstado(estado.valor)
+            .map { it.toResponse() }
+    }
+
+    fun obtenerPorFechaString(fecha: String): List<CitaResponse> {
+        val formatter = SimpleDateFormat("yyyy-MM-dd")
+        formatter.timeZone = TimeZone.getDefault()
+
+        val fechaDate = formatter.parse(fecha)
+            ?: throw RuntimeException("Formato inválido (usar YYYY-MM-DD)")
+
+        return citaRepo.findByFecha(fechaDate)
+            .map { it.toResponse() }
+    }
 
 
 }

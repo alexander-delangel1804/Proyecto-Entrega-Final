@@ -1,5 +1,8 @@
 package com.Veterinaria.Vetgo.service
 
+import com.Veterinaria.Vetgo.model.dto.PagoRequest
+import com.Veterinaria.Vetgo.model.dto.PagoResponse
+import com.Veterinaria.Vetgo.model.dto.PagoUpdateEstadoRequest
 import com.Veterinaria.Vetgo.model.entity.Pago
 import com.Veterinaria.Vetgo.repository.CitaRepository
 import com.Veterinaria.Vetgo.repository.PagoRepository
@@ -11,54 +14,71 @@ import java.time.LocalDateTime
 
 @Service
 class PagoService(
-    private val pagoRepository: PagoRepository,
-    private val citaRepository: CitaRepository,
-    private val servicioRepository: ServicioRepository,
-    private val reporteRepository: ReporteRepository,
+    private val pagoRepo: PagoRepository
 ) {
 
-    fun crearPagoParaCita(citaId: Int, metodo: String): Pago {
-
-        val cita = citaRepository.findById(citaId)
-            .orElseThrow { RuntimeException("Cita no encontrada") }
-
-        val servicio = servicioRepository.findById(cita.fkServicio)
-            .orElseThrow { RuntimeException("Servicio no encontrado") }
-
-        val reporte = reporteRepository.findByIdCita(citaId)
-
-        val costeExtra = reporte?.costeExtra ?: 0.0
-
-        val monto = servicio.precioBase
-            .add(BigDecimal.ZERO)
-
-        val pago = Pago(
-            fkServicio = cita.fkServicio,
-            fkCosteExtra = reporte?.idReporte,
-            montoTotal = monto,
-            metodoPago = metodo,
+    fun crearPago(req: PagoRequest): PagoResponse {
+        val nuevo = Pago(
+            fkServicio = req.fkServicio,
+            fkCosteExtra = req.fkCosteExtra,
+            fkCita = req.fkCita,
+            montoTotal = req.montoTotal,
+            metodoPago = req.metodoPago,
             estado = "Pendiente",
-            fechaPago = null
+            fechaPago = LocalDateTime.now()
         )
 
-        return pagoRepository.save(pago)
+        return pagoRepo.save(nuevo).toResponse()
     }
 
+    fun obtenerPagoPorId(idPago: Int): PagoResponse {
+        val pago = pagoRepo.findByIdPago(idPago)
+            ?: throw RuntimeException("No se encontró el pago con id $idPago")
+        return pago.toResponse()
+    }
 
+    fun obtenerPagosPorServicio(fkServicio: Int): List<PagoResponse> {
+        return pagoRepo.findByFkServicio(fkServicio)
+            .map { it.toResponse() }
+    }
 
+    fun obtenerPagosPorEstado(estado: String): List<PagoResponse> {
+        return pagoRepo.findByEstado(estado)
+            .map { it.toResponse() }
+    }
 
+    fun obtenerPagosPorCita(fkCita: Int): List<PagoResponse> {
+        return pagoRepo.findByFkCita(fkCita)
+            .map { it.toResponse() }
+    }
 
+    fun obtenerPagosPorFecha(fecha: LocalDateTime): List<PagoResponse> {
+        return pagoRepo.findByFechaPago(fecha)
+            .map { it.toResponse() }
+    }
 
+    fun actualizarEstado(idPago: Int, req: PagoUpdateEstadoRequest): PagoResponse {
+        val pago = pagoRepo.findByIdPago(idPago)
+            ?: throw RuntimeException("No se encontró el pago con id $idPago")
 
-    fun marcarPagoCompletado(idPago: Int) {
-
-        val pago = pagoRepository.findById(idPago)
-            .orElseThrow { RuntimeException("Pago no encontrado") }
-
-        pago.estado = "Completado"
+        pago.estado = req.estado
         pago.fechaPago = LocalDateTime.now()
 
-        pagoRepository.save(pago)
+        return pagoRepo.save(pago).toResponse()
     }
+
+    fun Pago.toResponse() = PagoResponse(
+        idPago = this.idPago,
+        fkServicio = this.fkServicio,
+        fkCosteExtra = this.fkCosteExtra,
+        fkCita = this.fkCita,
+        montoTotal = this.montoTotal,
+        metodoPago = this.metodoPago,
+        estado = this.estado,
+        fechaPago = this.fechaPago
+    )
+
+
 }
+
 

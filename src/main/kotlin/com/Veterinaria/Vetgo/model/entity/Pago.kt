@@ -5,7 +5,6 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
-
 @Entity
 @Table(name = "PAGOS")
 data class Pago(
@@ -19,6 +18,9 @@ data class Pago(
 
     @Column(name = "fk_coste_extra")
     val fkCosteExtra: Int? = null,
+
+    @Column(name = "fk_cita", nullable = false)
+    val fkCita: Int,
 
     @Column(name = "monto_total", precision = 10, scale = 2, nullable = false)
     val montoTotal: BigDecimal = BigDecimal("0.00"),

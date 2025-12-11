@@ -9,6 +9,9 @@ fun Cita.toResponse(): CitaResponse {
         .atZone(ZoneId.systemDefault())
         .toLocalDateTime()
 
+    val enumEstado = CitaEstado.from(this.estado)
+        ?: CitaEstado.EN_ESPERA
+
     return CitaResponse(
         idCita = this.idCita,
         fkIdCliente = this.fkIdCliente,
@@ -16,9 +19,10 @@ fun Cita.toResponse(): CitaResponse {
         fkMascota = this.fkMascota,
         fkIdVeterinario = this.fkIdVeterinario,
         fechaCita = fechaLocal,
-        estado = CitaEstado.from(this.estado) ?: CitaEstado.EN_ESPERA,
+        estado = enumEstado,
         detallesCita = this.detallesCita,
         metodoPago = this.metodoPago
     )
 }
+
 

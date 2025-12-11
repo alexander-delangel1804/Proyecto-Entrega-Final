@@ -1,5 +1,6 @@
 package com.Veterinaria.Vetgo.model.dto
 
+import com.Veterinaria.Vetgo.model.entity.Reporte
 import java.math.BigDecimal
 
 data class ReporteRequest(
@@ -26,3 +27,4 @@ data class ReporteResponse(
     val costeExtra: BigDecimal,
     val evidenciaFoto: String?
 )
+

@@ -3,7 +3,6 @@ package com.Veterinaria.Vetgo.service
 import com.Veterinaria.Vetgo.model.dto.ReporteRequest
 import com.Veterinaria.Vetgo.model.dto.ReporteResponse
 import com.Veterinaria.Vetgo.model.entity.Reporte
-import com.Veterinaria.Vetgo.repository.CitaRepository
 import com.Veterinaria.Vetgo.repository.ReporteRepository
 import com.Veterinaria.Vetgo.repository.UsuarioRepository
 import org.springframework.stereotype.Service
@@ -50,5 +49,50 @@ class ReporteService(
             evidenciaFoto = guardado.evidenciaFoto
         )
     }
+
+    fun obtenerPorId(id: Int): ReporteResponse {
+        val reporte = reporteRepository.findById(id)
+            .orElseThrow { IllegalArgumentException("El reporte no existe.") }
+
+        return reporte.toResponse()
+    }
+
+    fun obtenerPorVeterinario(idVeterinario: Int): List<ReporteResponse> {
+        return reporteRepository.findByIdVeterinario(idVeterinario).map { it.toResponse() }
+    }
+
+    fun obtenerPorCliente(idCliente: Int): List<ReporteResponse> {
+        return reporteRepository.findByIdCliente(idCliente).map { it.toResponse() }
+    }
+
+    fun obtenerPorCita(idCita: Int): ReporteResponse {
+        val reporte = reporteRepository.findByIdCita(idCita)
+            ?: throw IllegalArgumentException("No existe reporte para esta cita.")
+        return reporte.toResponse()
+    }
+
+    fun eliminarReporte(idReporte: Int) {
+        if (!reporteRepository.existsById(idReporte)) {
+            throw IllegalArgumentException("El reporte no existe.")
+        }
+        reporteRepository.deleteById(idReporte)
+    }
+
+    fun Reporte.toResponse(): ReporteResponse {
+        return ReporteResponse(
+            idReporte = idReporte,
+            idVeterinario = idVeterinario,
+            idCliente = idCliente,
+            idServicio = idServicio,
+            idMascota = idMascota,
+            idCita = idCita,
+            detalles = detalles,
+            observaciones = observaciones,
+            costeExtra = costeExtra,
+            evidenciaFoto = evidenciaFoto
+        )
+    }
+
+
 }
 
