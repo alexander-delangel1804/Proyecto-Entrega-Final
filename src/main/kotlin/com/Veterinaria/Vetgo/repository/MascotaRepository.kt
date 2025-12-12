@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface MascotaRepository : JpaRepository<Mascota, Int> {
-    fun findByUsuarioId(usuarioId: Int): List<Mascota>
+    fun findByClienteId(clienteId: Int): List<Mascota>
 
-    fun existsByNombreAndUsuarioId(nombre: String, usuarioId: Int): Boolean
+
 }

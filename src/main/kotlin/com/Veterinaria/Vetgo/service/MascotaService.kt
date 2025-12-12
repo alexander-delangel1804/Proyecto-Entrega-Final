@@ -2,21 +2,18 @@ package com.Veterinaria.Vetgo.service
 
 import com.Veterinaria.Vetgo.model.dto.MascotaRequest
 import com.Veterinaria.Vetgo.model.dto.MascotaResponse
+import com.Veterinaria.Vetgo.model.dto.MascotaUpdateRequest
 import com.Veterinaria.Vetgo.model.entity.Mascota
 import com.Veterinaria.Vetgo.repository.MascotaRepository
 import org.springframework.stereotype.Service
 
 @Service
 class MascotaService(
-    private val mascotaRepository: MascotaRepository
+    private val mascotaRepo: MascotaRepository
 ) {
+    fun getMascotasUsuario(clienteId: Int): List<MascotaResponse> {
 
-    fun getMascotasUsuario(usuarioId: Int, rolUsuario: String): List<MascotaResponse> {
-
-        if (rolUsuario != "Cliente")
-            throw IllegalAccessException("Solo los clientes pueden consultar sus mascotas.")
-
-        return mascotaRepository.findByUsuarioId(usuarioId)
+        return mascotaRepo.findByClienteId(clienteId)
             .map {
                 MascotaResponse(
                     idMascota = it.idMascota,
@@ -29,10 +26,7 @@ class MascotaService(
             }
     }
 
-    fun registrarMascota(request: MascotaRequest, rolUsuario: String): MascotaResponse {
-
-        if (rolUsuario != "Cliente")
-            throw IllegalAccessException("Solo los clientes pueden registrar mascotas.")
+    fun registrarMascota(request: MascotaRequest): MascotaResponse {
 
         if (request.sexo != null &&
             request.sexo !in listOf("Macho", "Hembra")
@@ -41,7 +35,7 @@ class MascotaService(
         }
 
         val mascota = Mascota(
-            usuarioId = request.usuarioId,
+            clienteId = request.clienteId,
             nombre = request.nombre,
             especie = request.especie,
             edad = request.edad,
@@ -49,7 +43,7 @@ class MascotaService(
             sexo = request.sexo
         )
 
-        val guardado = mascotaRepository.save(mascota)
+        val guardado = mascotaRepo.save(mascota)
 
         return MascotaResponse(
             idMascota = guardado.idMascota,
@@ -61,17 +55,39 @@ class MascotaService(
         )
     }
 
-    fun eliminarMascota(idMascota: Int, idUsuario: Int, rolUsuario: String) {
+    fun eliminarMascota(idMascota: Int, idUsuario: Int) {
 
-        if (rolUsuario != "Cliente")
-            throw IllegalAccessException("Solo los clientes pueden eliminar mascotas.")
-
-        val mascota = mascotaRepository.findById(idMascota)
+        val mascota = mascotaRepo.findById(idMascota)
             .orElseThrow { IllegalArgumentException("La mascota no existe.") }
 
-        if (mascota.usuarioId != idUsuario)
+        if (mascota.clienteId != idUsuario)
             throw IllegalAccessException("No tienes permiso para eliminar esta mascota.")
 
-        mascotaRepository.delete(mascota)
+        mascotaRepo.delete(mascota)
     }
+
+    fun editarMascota(idMascota: Int, req: MascotaUpdateRequest): MascotaResponse {
+        val mascota = mascotaRepo.findById(idMascota)
+            .orElseThrow { RuntimeException("Mascota no encontrada") }
+
+        val mascotaEditada = mascota.copy(
+            nombre = req.nombre ?: mascota.nombre,
+            especie = req.especie ?: mascota.especie,
+            edad = req.edad ?: mascota.edad,
+            peso = req.peso ?: mascota.peso,
+            sexo = req.sexo ?: mascota.sexo
+        )
+
+        val guardada = mascotaRepo.save(mascotaEditada)
+        return guardada.toResponse()
+    }
+
+    fun Mascota.toResponse() = MascotaResponse(
+        idMascota = idMascota,
+        nombre = nombre,
+        especie = especie,
+        edad = edad,
+        peso = peso,
+        sexo = sexo
+    )
 }

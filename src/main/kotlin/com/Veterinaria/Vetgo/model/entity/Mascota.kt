@@ -10,8 +10,8 @@ data class Mascota(
     @Column(name = "id_mascota")
     val idMascota: Int = 0,
 
-    @Column(name = "fk_id_usuario", nullable = false)
-    val usuarioId: Int,
+    @Column(name = "fk_id_cliente", nullable = false)
+    val clienteId: Int,
 
     @Column(nullable = false)
     val nombre: String,

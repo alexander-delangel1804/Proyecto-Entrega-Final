@@ -1,6 +1,7 @@
 package com.Veterinaria.Vetgo.model.entity
 
 import jakarta.persistence.*
+
 @Entity
 @Table(name = "USUARIOS")
 data class Usuario(

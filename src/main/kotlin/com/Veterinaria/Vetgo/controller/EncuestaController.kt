@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/encuestas")
 class EncuestaController(private val encuestaService: EncuestaService) {
 
-    @GetMapping
+    @GetMapping("")
     fun obtenerTodas(): ResponseEntity<List<EncuestaResponse>> =
         ResponseEntity.ok(encuestaService.listarTodas())
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     fun obtenerPorIdEncuesta(@PathVariable id: Int): ResponseEntity<List<EncuestaResponse>> =
         ResponseEntity.ok(encuestaService.obtenerPorIdEncuesta(id))
 
@@ -31,11 +31,11 @@ class EncuestaController(private val encuestaService: EncuestaService) {
     fun obtenerPorFecha(@PathVariable fecha: String): ResponseEntity<List<EncuestaResponse>> =
         ResponseEntity.ok(encuestaService.obtenerPorFecha(fecha))
 
-    @PostMapping
+    @PostMapping("/crear")
     fun crearEncuesta(@RequestBody request: EncuestaRequest): ResponseEntity<EncuestaResponse> =
         ResponseEntity.ok(encuestaService.crearEncuesta(request))
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     fun eliminar(@PathVariable id: Int): ResponseEntity<String> {
         return if (encuestaService.eliminarEncuesta(id)) {
             ResponseEntity.ok("Encuesta eliminada correctamente.")

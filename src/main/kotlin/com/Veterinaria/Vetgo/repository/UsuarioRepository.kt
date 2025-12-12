@@ -16,8 +16,6 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
 
     fun existsByCorreo(correo: String): Boolean
 
-
-
 }
 
 
