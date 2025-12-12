@@ -19,7 +19,6 @@ class CitaController(private val citaService: CitaService) {
         val creada = citaService.crearCita(req)
         return ResponseEntity.ok(creada.toResponse())
     }
-
     @GetMapping("/historial/{idCliente}")
     fun getCitasCliente(@PathVariable idCliente: Int): ResponseEntity<List<CitaResponse>> {
         val list = citaService.obtenerCitasPorCliente(idCliente)
@@ -33,23 +32,17 @@ class CitaController(private val citaService: CitaService) {
     }*/
 
     @PutMapping("/accion/{idCita}")
-    fun accionSobreCita(
-        @PathVariable idCita: Int,
-        @RequestBody req: AccionRequest
-    ): ResponseEntity<CitaResponse> {
-
+    fun accionSobreCita(@PathVariable idCita: Int, @RequestBody req: AccionRequest): ResponseEntity<CitaResponse> {
         val res = citaService.ejecutarAccion(idCita, req)
         return ResponseEntity.ok(res)
     }
 
     @GetMapping("/metodo-pago/{metodoPago}")
-    fun getPorMetodoPago(@PathVariable metodoPago: String)
-            : ResponseEntity<List<CitaResponse>> {
+    fun getPorMetodoPago(@PathVariable metodoPago: String): ResponseEntity<List<CitaResponse>> {
 
         val list = citaService.obtenerPorMetodoPago(metodoPago)
         return ResponseEntity.ok(list)
     }
-
 
     @GetMapping("/estado/{estado}")
     fun getPorEstado(@PathVariable estado: String): ResponseEntity<List<CitaResponse>> {
@@ -67,5 +60,27 @@ class CitaController(private val citaService: CitaService) {
         val list = citaService.obtenerPorFechaString(fecha)
         return ResponseEntity.ok(list)
     }
+
+    /*Estados de una cita
+    CREAR,
+    CANCELAR_CLIENTE,
+    CANCELAR_VETERINARIO,
+    TOMAR,
+    MARCAR_EN_CAMINO,
+    INICIAR_SERVICIO,
+    COMPLETAR_SERVICIO,
+    MARCAR_PAGADA
+
+    ----En string----
+    En espera
+    Cancelada por cliente
+    Asignada a veterinario
+    En camino
+    En servicio
+    Completada
+    Pagada
+    Cancelada por veterinario
+    */
+
 
 }

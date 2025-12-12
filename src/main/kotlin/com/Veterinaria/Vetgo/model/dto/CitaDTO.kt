@@ -28,7 +28,7 @@ data class CitaResponse(
 
 data class AccionRequest(
     val accion: CitaAccion,
-    val actorId: Int
+    val usuario_Id: Int
 )
 
 

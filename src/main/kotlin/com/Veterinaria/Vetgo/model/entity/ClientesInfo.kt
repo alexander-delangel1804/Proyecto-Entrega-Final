@@ -10,7 +10,7 @@ data class ClientesInfo(
 
     @Id
     @Column(name = "fk_id_cliente")
-    val clienteId: Long,
+    val clienteId: Int = 0,
 
     @OneToOne
     @MapsId
@@ -33,5 +33,5 @@ data class ClientesInfo(
     var tarjetaToken: String? = null,
 
     @Column(name = "fecha_registro")
-    var fechaRegistro: java.time.LocalDateTime? = null
+    var fechaRegistro: LocalDateTime? = null
 )

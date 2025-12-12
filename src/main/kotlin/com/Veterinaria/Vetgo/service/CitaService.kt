@@ -10,7 +10,6 @@ import com.Veterinaria.Vetgo.repository.CitaRepository
 import org.springframework.stereotype.Service
 import com.Veterinaria.Vetgo.model.enums.toResponse
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -32,7 +31,7 @@ class CitaService(
         val cita = procesarAccion(
             idCita = idCita,
             accion = req.accion,
-            idVeterinario = req.actorId
+            idVeterinario = req.usuario_Id
         )
         return cita.toResponse()
     }

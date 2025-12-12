@@ -25,9 +25,10 @@ class UsuarioService(
         }
 
         val userId = usuario.idUsuario
-        val vetInfo = vetRepo.findByUsuarioIdUsuario(userId)
+        val vetInfo = vetRepo.findByIdVeterinario(userId)
+
         if (usuario.rol == "Veterinario" && vetInfo != null) {
-            val estado = vetInfo.estado?.trim()
+            val estado = vetInfo.estado.trim()
             if (estado != "Activo" && estado != "Disponible") {
                 return LoginResponse("El veterinario no está autorizado", null)
             }
@@ -72,5 +73,6 @@ class UsuarioService(
         }
         return usuario
     }
+
 
 }

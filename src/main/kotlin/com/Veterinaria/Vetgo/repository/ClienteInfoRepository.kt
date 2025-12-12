@@ -6,9 +6,4 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface ClienteInfoRepository : JpaRepository<ClientesInfo, Long> {
-    fun findByClienteId(clienteId: Long): Optional<ClientesInfo>
-
-    fun existsByClienteId(clienteId: Long): Boolean
-
-}
+interface ClienteInfoRepository : JpaRepository<ClientesInfo, Int>

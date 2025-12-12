@@ -12,12 +12,12 @@ import com.Veterinaria.Vetgo.repository.VeterinariosInfoRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
-/*@Service
-class RegisterService(
+@Service
+class RegisterClienteService(
     private val usuarioRepo: UsuarioRepository,
-    private val vetRepo: VeterinariosInfoRepository,
-    private val clienteInfoRepo: ClienteInfoRepository
+    private val clienteRepo: ClienteInfoRepository
 ) {
 
     @Transactional
@@ -40,52 +40,14 @@ class RegisterService(
         val guardado = usuarioRepo.save(usuario)
 
         val clienteInfo = ClientesInfo(
-            clienteId = guardado.idUsuario.toLong(),
             cliente = guardado
         )
 
-        clienteInfoRepo.save(clienteInfo)
+        clienteRepo.save(clienteInfo)
 
         return RegisterUsuarioResponse(
             idUsuario = guardado.idUsuario,
             mensaje = "Cliente registrado correctamente"
         )
     }
-
-    @Transactional
-    fun registrarVeterinario(req: RegisterVeterinarioRequest): RegisterUsuarioResponse {
-
-        if (usuarioRepo.existsByCorreo(req.correo)) {
-            throw IllegalArgumentException("El correo ya está registrado")
-        }
-
-        val usuario = Usuario(
-            nombre = req.nombre,
-            correo = req.correo,
-            contrasena = req.contrasena,
-            telefono = req.telefono,
-            direccion = req.direccion,
-            ciudad = req.ciudad,
-            rol = "Veterinario"
-        )
-
-        val guardado = usuarioRepo.save(usuario)
-
-        val vetInfo = VeterinariosInfo(
-            usuario = guardado,
-            cedulaProfesional = req.cedulaProfesional,
-            especialidad = req.especialidad,
-            estado = "Inactivo",
-            califPromedio = BigDecimal.ZERO
-        )
-
-        vetRepo.save(vetInfo)
-
-        return RegisterUsuarioResponse(
-            idUsuario = guardado.idUsuario,
-            mensaje = "Veterinario registrado correctamente"
-        )
-    }
 }
-
- */

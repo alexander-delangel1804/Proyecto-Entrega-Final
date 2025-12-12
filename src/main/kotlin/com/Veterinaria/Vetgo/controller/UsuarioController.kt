@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController
 class UsuarioController(
     private val usuarioService: UsuarioService
 ) {
-
     @GetMapping("")
     fun obtenerTodosUsuarios(): ResponseEntity<List<Usuario>> =
         ResponseEntity.ok(usuarioService.obtenerTodosUsuarios())

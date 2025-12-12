@@ -1,7 +1,7 @@
 package com.Veterinaria.Vetgo.model.enums
 
 enum class CitaAccion {
-    CREAR,
+    //CREAR,
     CANCELAR_CLIENTE,
     CANCELAR_VETERINARIO,
     TOMAR,
