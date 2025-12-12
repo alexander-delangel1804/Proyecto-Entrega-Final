@@ -4,6 +4,7 @@ import com.Veterinaria.Vetgo.model.dto.LoginRequest
 import com.Veterinaria.Vetgo.repository.UsuarioRepository
 import com.Veterinaria.Vetgo.model.dto.LoginResponse
 import com.Veterinaria.Vetgo.model.dto.UsuarioResponse
+import com.Veterinaria.Vetgo.model.entity.Usuario
 import com.Veterinaria.Vetgo.repository.VeterinariosInfoRepository
 import org.springframework.stereotype.Service
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service
 class UsuarioService(
     private val usuarioRepository: UsuarioRepository,
     private val vetRepo: VeterinariosInfoRepository
+
 ) {
 
     fun login(request: LoginRequest): LoginResponse {
@@ -43,4 +45,32 @@ class UsuarioService(
 
         return LoginResponse("Login exitoso", usuarioResponse)
     }
+
+
+    fun obtenerTodosUsuarios(): List<Usuario> =
+        usuarioRepository.findAll()
+    fun obtenerPorId(id: Int): Usuario =
+        usuarioRepository.findById(id)
+            .orElseThrow { RuntimeException("Usuario no encontrado") }
+    fun obtenerClientes(): List<Usuario> =
+        usuarioRepository.findByRol("Cliente")
+    fun obtenerVeterinarios(): List<Usuario> =
+        usuarioRepository.findByRol("Veterinario")
+
+    fun obtenerClientePorId(id: Int): Usuario {
+        val usuario = obtenerPorId(id)
+        if (usuario.rol != "Cliente") {
+            throw RuntimeException("El usuario con ID $id no es un Cliente")
+        }
+        return usuario
+    }
+
+    fun obtenerVeterinarioPorId(id: Int): Usuario {
+        val usuario = obtenerPorId(id)
+        if (usuario.rol != "Veterinario") {
+            throw RuntimeException("El usuario con ID $id no es un Veterinario")
+        }
+        return usuario
+    }
+
 }

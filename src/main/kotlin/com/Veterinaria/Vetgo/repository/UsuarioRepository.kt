@@ -15,6 +15,9 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
     fun findByRol(rol: String): List<Usuario>
 
     fun existsByCorreo(correo: String): Boolean
+
+
+
 }
 
 

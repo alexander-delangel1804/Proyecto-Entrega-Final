@@ -2,7 +2,6 @@ package com.Veterinaria.Vetgo.model.entity
 
 import jakarta.persistence.*
 import java.math.BigDecimal
-
 @Entity
 @Table(name = "SERVICIOS")
 data class Servicio(
