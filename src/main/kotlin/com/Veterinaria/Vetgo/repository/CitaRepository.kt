@@ -22,7 +22,8 @@ interface CitaRepository : JpaRepository<Cita, Int> {
     fun findByEstado(estado: String): List<Cita>
 
     fun findByMetodoPago(metodoPago: String): List<Cita>
-    
+
+    fun existsByFkIdClienteAndEstado(idCliente: Int, estado: String): Boolean
 
 
 

@@ -15,4 +15,7 @@ interface EncuestaRepository : JpaRepository<Encuesta, Int> {
     fun findByIdVeterinario(idVeterinario: Int): List<Encuesta>
 
     fun findByFecha(fecha: Date): List<Encuesta>
+
+    fun existsByIdClienteAndIdVeterinario(idCliente: Int, idVeterinario: Int): Boolean
+
 }

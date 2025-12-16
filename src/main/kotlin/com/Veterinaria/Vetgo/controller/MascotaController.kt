@@ -17,8 +17,10 @@ class MascotaController(
         mascotaService.getMascotasUsuario(usuarioId)
 
     @PostMapping("/registrar")
-    fun registrarMascota(@RequestParam request: MascotaRequest): MascotaResponse =
-        mascotaService.registrarMascota(request)
+    fun registrarMascota(@RequestBody request: MascotaRequest): ResponseEntity<MascotaResponse> {
+        val mascota = mascotaService.registrarMascota(request)
+        return ResponseEntity.ok(mascota)
+    }
 
     @DeleteMapping("/eliminar/{idMascota}")
     fun eliminarMascota(@PathVariable idMascota: Int, @RequestParam idCliente: Int): ResponseEntity<String> {

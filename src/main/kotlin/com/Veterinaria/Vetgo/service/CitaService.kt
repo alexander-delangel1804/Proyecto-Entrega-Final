@@ -1,5 +1,6 @@
 package com.Veterinaria.Vetgo.service
 
+import com.Veterinaria.Vetgo.exception.citas.*
 import com.Veterinaria.Vetgo.model.dto.AccionRequest
 import com.Veterinaria.Vetgo.model.dto.CitaResponse
 import com.Veterinaria.Vetgo.model.dto.CrearCitaRequest
@@ -9,23 +10,20 @@ import com.Veterinaria.Vetgo.model.enums.CitaEstado
 import com.Veterinaria.Vetgo.repository.CitaRepository
 import org.springframework.stereotype.Service
 import com.Veterinaria.Vetgo.model.enums.toResponse
+import com.Veterinaria.Vetgo.repository.MascotaRepository
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Service
 class CitaService(
-    private val citaRepo: CitaRepository
+    private val citaRepo: CitaRepository,
+    private val mascotaRepo: MascotaRepository
 ) {
+
     fun obtenerCitasPorCliente(idCliente: Int): List<CitaResponse> {
         return citaRepo.findByFkIdCliente(idCliente)
             .map { it.toResponse() }
     }
-
-    /*fun obtenerCitasPendientes(): List<CitaResponse> {
-        return citaRepo.findByEstado(CitaEstado.EN_ESPERA.valor)
-            .map { it.toResponse() }
-    }
-     */
 
     fun ejecutarAccion(idCita: Int, req: AccionRequest): CitaResponse {
         val cita = procesarAccion(
@@ -37,6 +35,24 @@ class CitaService(
     }
 
     fun crearCita(req: CrearCitaRequest): Cita {
+
+        val mascota = mascotaRepo.findById(req.fkMascota)
+            .orElseThrow {
+                RuntimeException("La mascota no existe") // opcional: excepción propia
+            }
+
+        if (mascota.clienteId != req.fkIdCliente) {
+            throw MascotaNoPerteneceAlClienteException()
+        }
+
+        val tieneCitaPendiente = citaRepo.existsByFkIdClienteAndEstado(
+            req.fkIdCliente,
+            CitaEstado.EN_ESPERA.valor
+        )
+
+        if (tieneCitaPendiente) {
+            throw ClienteConCitaPendienteException()
+        }
         val nueva = Cita(
             fkIdCliente = req.fkIdCliente,
             fkServicio = req.fkServicio,
@@ -49,17 +65,23 @@ class CitaService(
         return citaRepo.save(nueva)
     }
 
-    fun procesarAccion(idCita: Int, accion: CitaAccion, idVeterinario: Int? = null): Cita {
-        val cita = citaRepo.findById(idCita).orElseThrow {
-            RuntimeException("La cita no existe")
-        }
+    fun procesarAccion(
+        idCita: Int,
+        accion: CitaAccion,
+        idVeterinario: Int? = null
+    ): Cita {
+
+        val cita = citaRepo.findById(idCita)
+            .orElseThrow { CitaNoEncontradaException(idCita) }
 
         when (accion) {
 
             CitaAccion.CANCELAR_CLIENTE -> {
-                if (cita.estado == CitaEstado.PAGADA.valor)
-                    throw RuntimeException("No puedes cancelar una cita pagada")
-
+                if (cita.estado == CitaEstado.PAGADA.valor) {
+                    throw AccionCitaNoPermitidaException(
+                        "No puedes cancelar una cita que ya fue pagada"
+                    )
+                }
                 cita.estado = CitaEstado.CANCELADA_CLIENTE.valor
             }
 
@@ -68,9 +90,9 @@ class CitaService(
             }
 
             CitaAccion.TOMAR -> {
-                if (idVeterinario == null)
-                    throw RuntimeException("Se requiere ID de veterinario")
-
+                if (idVeterinario == null) {
+                    throw VeterinarioRequeridoException()
+                }
                 cita.fkIdVeterinario = idVeterinario
                 cita.estado = CitaEstado.ASIGNADA_VETERINARIO.valor
             }
@@ -94,8 +116,6 @@ class CitaService(
                 validarCambio(cita, CitaEstado.COMPLETADA)
                 cita.estado = CitaEstado.PAGADA.valor
             }
-
-            else -> {}
         }
 
         return citaRepo.save(cita)
@@ -103,7 +123,10 @@ class CitaService(
 
     private fun validarCambio(cita: Cita, requerido: CitaEstado) {
         if (cita.estado != requerido.valor) {
-            throw RuntimeException("La cita debe estar en '${requerido.valor}' para continuar. Estado actual: ${cita.estado}")
+            throw EstadoCitaInvalidoException(
+                estadoActual = cita.estado,
+                estadoRequerido = requerido.valor
+            )
         }
     }
 
@@ -121,13 +144,14 @@ class CitaService(
         val formatter = SimpleDateFormat("yyyy-MM-dd")
         formatter.timeZone = TimeZone.getDefault()
 
-        val fechaDate = formatter.parse(fecha)
-            ?: throw RuntimeException("Formato inválido (usar YYYY-MM-DD)")
+        val fechaDate = try {
+            formatter.parse(fecha)
+        } catch (ex: Exception) {
+            throw FormatoFechaInvalidoException()
+        }
 
         return citaRepo.findByFecha(fechaDate)
             .map { it.toResponse() }
     }
-
-
 }
 

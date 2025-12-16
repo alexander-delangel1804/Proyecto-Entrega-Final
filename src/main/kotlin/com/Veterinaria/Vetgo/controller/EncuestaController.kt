@@ -37,10 +37,7 @@ class EncuestaController(private val encuestaService: EncuestaService) {
 
     @DeleteMapping("/eliminar/{id}")
     fun eliminar(@PathVariable id: Int): ResponseEntity<String> {
-        return if (encuestaService.eliminarEncuesta(id)) {
-            ResponseEntity.ok("Encuesta eliminada correctamente.")
-        } else {
-            ResponseEntity.status(404).body("No se encontró la encuesta.")
-        }
+        encuestaService.eliminarEncuesta(id)
+        return ResponseEntity.ok("Encuesta eliminada correctamente.")
     }
 }
